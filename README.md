@@ -8,7 +8,7 @@ TypeScript union types for Maybe and RemoteData with pattern matching.
 ## Installation
 
 ```bash
-npm install @mvst-gmbh/ts-unions
+npm install @mvst/ts-unions
 ```
 
 ## Usage
@@ -19,7 +19,7 @@ The `Maybe` type represents a value that might or might not exist. It's useful f
 nullable values in a type-safe way.
 
 ```typescript
-import { Maybe, just, nothing, when } from "@mvst-gmbh/ts-unions";
+import { Maybe, just, nothing, when } from "@mvst/ts-unions";
 
 // Creating Maybe values
 const someValue: Maybe<number> = just(42);
@@ -51,7 +51,7 @@ The `RemoteData` type represents the state of a remote data operation. It's perf
 handling API calls and async operations.
 
 ```typescript
-import { RemoteData, notAsked, loading, success, error, when } from "@mvst-gmbh/ts-unions";
+import { RemoteData, notAsked, loading, success, error, when } from "@mvst/ts-unions";
 
 // Creating RemoteData values
 const data: RemoteData<string> = notAsked();
