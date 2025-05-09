@@ -1,0 +1,49 @@
+{
+  "name": "ts-unions",
+  "version": "0.1.0",
+  "description": "TypeScript union types for Maybe and RemoteData with pattern matching",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "prepare": "npm run build",
+    "lint": "eslint . --fix"
+  },
+  "keywords": [
+    "typescript",
+    "maybe",
+    "remote-data",
+    "union-types",
+    "pattern-matching"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matheuslustosa/ts-unions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/matheuslustosa/ts-unions/issues"
+  },
+  "homepage": "https://github.com/matheuslustosa/ts-unions#readme",
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.26.0",
+    "@types/node": "^22.15.17",
+    "@typescript-eslint/eslint-plugin": "^8.32.0",
+    "@typescript-eslint/parser": "^8.32.0",
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  }
+}
