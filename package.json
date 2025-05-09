@@ -30,12 +30,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/matheuslustosa/ts-unions.git"
+    "url": "git+https://github.com/mvstgmbh/ts-unions.git"
   },
   "bugs": {
-    "url": "https://github.com/matheuslustosa/ts-unions/issues"
+    "url": "https://github.com/mvstgmbh/ts-unions/issues"
   },
-  "homepage": "https://github.com/matheuslustosa/ts-unions#readme",
+  "homepage": "https://github.com/mvstgmbh/ts-unions#readme",
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.26.0",
