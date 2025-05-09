@@ -22,6 +22,10 @@ function isNothing<T>(maybe: Maybe<T>) {
   return maybe.type === "Nothing";
 }
 
+function withDefault<T, TResult>(defaultValue: TResult, maybe: Maybe<T>) {
+  return isJust(maybe) ? maybe.value : defaultValue;
+}
+
 function when<T, TResult>(maybe: Maybe<T>, pattern: Pattern<T, TResult>): TResult {
   const { nothing, just, _ = Function.prototype } = pattern;
 
@@ -42,4 +46,4 @@ function andThen<T, TResult>(fn: (value: T) => Maybe<TResult>, maybe: Maybe<T>) 
   return isJust(maybe) ? fn(maybe.value) : maybe;
 }
 
-export { andThen, isJust, isNothing, just, map, nothing, when };
+export { andThen, isJust, isNothing, just, map, nothing, when, withDefault };

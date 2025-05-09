@@ -44,6 +44,10 @@ function isNotAsked<T>(remoteData: RemoteData<T>) {
   return remoteData.type === "NotAsked";
 }
 
+function withDefault<T, TResult>(defaultValue: TResult, remoteData: RemoteData<T>) {
+  return isSuccess(remoteData) ? remoteData.value : defaultValue;
+}
+
 function when<T, TResult>(remoteData: RemoteData<T>, pattern: Pattern<T, TResult>): TResult {
   const { notAsked, loading, success, error, _ = Function.prototype } = pattern;
 
@@ -82,4 +86,5 @@ export {
   notAsked,
   success,
   when,
+  withDefault,
 };

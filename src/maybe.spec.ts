@@ -80,4 +80,24 @@ describe("Maybe", () => {
       expect(result).toEqual({ type: "Nothing" });
     });
   });
+
+  describe("withDefault", () => {
+    it("should return the value when Maybe is Just", () => {
+      const value = M.just(42);
+      const result = M.withDefault(0, value);
+      expect(result).toBe(42);
+    });
+
+    it("should return the default value when Maybe is Nothing", () => {
+      const value = M.nothing<number>();
+      const result = M.withDefault(0, value);
+      expect(result).toBe(0);
+    });
+
+    it("should work with different types", () => {
+      const value = M.nothing<number>();
+      const result = M.withDefault("default", value);
+      expect(result).toBe("default");
+    });
+  });
 });

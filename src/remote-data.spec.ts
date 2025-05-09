@@ -171,4 +171,37 @@ describe("RemoteData", () => {
       expect(result).toEqual({ type: "Error", error: err });
     });
   });
+
+  describe("withDefault", () => {
+    it("should return the value when RemoteData is Success", () => {
+      const value = RD.success(42);
+      const result = RD.withDefault(0, value);
+      expect(result).toBe(42);
+    });
+
+    it("should return the default value when RemoteData is NotAsked", () => {
+      const value = RD.notAsked<number>();
+      const result = RD.withDefault(0, value);
+      expect(result).toBe(0);
+    });
+
+    it("should return the default value when RemoteData is Loading", () => {
+      const value = RD.loading<number>();
+      const result = RD.withDefault(0, value);
+      expect(result).toBe(0);
+    });
+
+    it("should return the default value when RemoteData is Error", () => {
+      const err = new Error("test");
+      const value = RD.error<number>(err);
+      const result = RD.withDefault(0, value);
+      expect(result).toBe(0);
+    });
+
+    it("should work with different types", () => {
+      const value = RD.notAsked<number>();
+      const result = RD.withDefault("default", value);
+      expect(result).toBe("default");
+    });
+  });
 });
