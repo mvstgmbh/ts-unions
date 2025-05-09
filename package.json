@@ -17,8 +17,7 @@
     "build": "tsc",
     "test": "vitest",
     "prepare": "npm run build",
-    "lint": "eslint .",
-    "prepublishOnly": "npm run build"
+    "lint": "eslint ."
   },
   "keywords": [
     "typescript",
