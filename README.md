@@ -1,124 +1,105 @@
 # ts-unions
 
-A TypeScript library providing Maybe and RemoteData union types with pattern matching, functor, and monad implementations.
+TypeScript union types for Maybe and RemoteData with pattern matching.
+
+[![npm version](https://badge.fury.io/js/ts-unions.svg)](https://badge.fury.io/js/ts-unions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Installation
 
 ```bash
-npm install ts-unions
+npm install @mvst-gmbh/ts-unions
 ```
 
-## Maybe
+## Usage
 
-The Maybe type represents an optional value. It can be either `Just` containing a value or `Nothing`.
+### Maybe Type
 
-### Usage
+The `Maybe` type represents a value that might or might not exist. It's useful for handling 
+nullable values in a type-safe way.
 
 ```typescript
-import { M } from 'ts-unions';
+import { Maybe, just, nothing, when } from "@mvst-gmbh/ts-unions";
 
 // Creating Maybe values
-const justValue = M.just(42);
-const nothing = M.nothing<number>();
+const someValue: Maybe<number> = just(42);
+const noValue: Maybe<number> = nothing();
 
 // Pattern matching
-const result = M.when(justValue, {
-  just: (value) => `Got value: ${value}`,
-  nothing: () => 'No value',
+const result = when(someValue, {
+  just: (value) => `Value is ${value}`,
+  nothing: () => "No value"
 });
 
-// Using map (functor)
-const doubled = M.map(justValue, (x) => x * 2);
-
-// Using chain (monad)
-const chained = M.chain(justValue, (x) => M.just(x * 2));
-
-// Chaining multiple operations
-const result = M.chain(
-  M.map(justValue, (x) => x * 2),
-  (x) => M.just(x + 1)
-);
+// Transforming values
+const doubled = map((x) => x * 2, someValue);
 ```
 
-## RemoteData
+#### Maybe API
 
-The RemoteData type represents the state of a remote data request. It can be one of:
-- `NotAsked`: Initial state
-- `Loading`: Request in progress
-- `Success`: Request succeeded with data
-- `Error`: Request failed with an error
+- `just<T>(value: T): Maybe<T>` - Creates a Maybe with a value
+- `nothing<T>(): Maybe<T>` - Creates a Maybe without a value
+- `when<T, R>(maybe: Maybe<T>, pattern: { just?: (value: T) => R, nothing?: () => R, _?: () => R }): R` - Pattern matching
+- `map<T, R>(fn: (value: T) => R, maybe: Maybe<T>): Maybe<R>` - Transform the value if it exists
+- `andThen<T, R>(fn: (value: T) => Maybe<R>, maybe: Maybe<T>): Maybe<R>` - Chain Maybe operations
+- `isJust<T>(maybe: Maybe<T>): boolean` - Check if Maybe has a value
+- `isNothing<T>(maybe: Maybe<T>): boolean` - Check if Maybe has no value
 
-### Usage
+### RemoteData Type
+
+The `RemoteData` type represents the state of a remote data operation. It's perfect for 
+handling API calls and async operations.
 
 ```typescript
-import { RD } from 'ts-unions';
+import { RemoteData, notAsked, loading, success, error, when } from "@mvst-gmbh/ts-unions";
 
 // Creating RemoteData values
-const notAsked = RD.notAsked<number>();
-const loading = RD.loading<number>();
-const success = RD.success(42);
-const error = RD.error(new Error('Failed'));
+const data: RemoteData<string> = notAsked();
+const loadingData: RemoteData<string> = loading();
+const successData: RemoteData<string> = success("Data loaded");
+const errorData: RemoteData<string> = error(new Error("Failed to load"));
 
 // Pattern matching
-const result = RD.when(success, {
-  notAsked: () => 'Not started',
-  loading: () => 'Loading...',
-  success: (value) => `Got value: ${value}`,
-  error: (err) => `Error: ${err.message}`,
+const result = when(data, {
+  notAsked: () => "Not started",
+  loading: () => "Loading...",
+  success: (value) => `Data: ${value}`,
+  error: (err) => `Error: ${err.message}`
 });
 
-// Using map (functor)
-const doubled = RD.map(success, (x) => x * 2);
-
-// Using chain (monad)
-const chained = RD.chain(success, (x) => RD.success(x * 2));
-
-// Chaining multiple operations
-const result = RD.chain(
-  RD.map(success, (x) => x * 2),
-  (x) => RD.success(x + 1)
-);
-
-// Handling API calls
-async function fetchUser(id: number): Promise<RemoteData<User, Error>> {
-  try {
-    const response = await fetch(`/api/users/${id}`);
-    if (!response.ok) {
-      return RD.error(new Error('Failed to fetch user'));
-    }
-    const user = await response.json();
-    return RD.success(user);
-  } catch (err) {
-    return RD.error(err instanceof Error ? err : new Error('Unknown error'));
-  }
-}
+// Transforming values
+const transformed = map((value) => value.toUpperCase(), successData);
 ```
+
+#### RemoteData API
+
+- `notAsked<T>(): RemoteData<T>` - Initial state
+- `loading<T>(): RemoteData<T>` - Loading state
+- `success<T>(value: T): RemoteData<T>` - Success state with value
+- `error<T>(error: Error): RemoteData<T>` - Error state with error
+- `when<T, R>(data: RemoteData<T>, pattern: { notAsked?: () => R, loading?: () => R, success?: (value: T) => R, error?: (error: Error) => R, _?: () => R }): R` - Pattern matching
+- `map<T, R>(fn: (value: T) => R, data: RemoteData<T>): RemoteData<R>` - Transform success value
+- `andThen<T, R>(fn: (value: T) => RemoteData<R>, data: RemoteData<T>): RemoteData<R>` - Chain RemoteData operations
+- `isNotAsked<T>(data: RemoteData<T>): boolean` - Check if not asked
+- `isLoading<T>(data: RemoteData<T>): boolean` - Check if loading
+- `isSuccess<T>(data: RemoteData<T>): boolean` - Check if success
+- `isError<T>(data: RemoteData<T>): boolean` - Check if error
 
 ## Type Safety
 
-Both Maybe and RemoteData are fully type-safe. TypeScript will ensure you handle all possible cases 
-in pattern matching and maintain type safety throughout your transformations.
+Both `Maybe` and `RemoteData` are implemented as discriminated unions, providing full type safety 
+and exhaustive pattern matching. TypeScript will ensure you handle all possible cases when using 
+pattern matching.
 
-## API Reference
+All the values are immutable, meaning that operations like `map` and `andThen` return new instances
+instead of modifying the original value. Also, the library is designed to be tree-shakable and the
+values are serializable.
 
-### Maybe
+## Contributing
 
-- `M.nothing<T>()`: Creates a Nothing value
-- `M.just<T>(value: T)`: Creates a Just value
-- `M.when<T, R>(maybe: Maybe<T>, pattern: MaybePattern<T, R>)`: Pattern matching
-- `M.map<T, U>(maybe: Maybe<T>, fn: (value: T) => U)`: Functor implementation
-- `M.chain<T, U>(maybe: Maybe<T>, fn: (value: T) => Maybe<U>)`: Monad implementation
-
-### RemoteData
-
-- `RD.notAsked<T, E>()`: Creates a NotAsked value
-- `RD.loading<T, E>()`: Creates a Loading value
-- `RD.success<T, E>(value: T)`: Creates a Success value
-- `RD.error<T, E>(error: E)`: Creates an Error value
-- `RD.when<T, E, R>(remoteData: RemoteData<T, E>, pattern: RemoteDataPattern<T, E, R>)`: Pattern matching
-- `RD.map<T, U, E>(remoteData: RemoteData<T, E>, fn: (value: T) => U)`: Functor implementation
-- `RD.chain<T, U, E>(remoteData: RemoteData<T, E>, fn: (value: T) => RemoteData<U, E>)`: Monad implementation
+Please read [CONTRIBUTORS.md](CONTRIBUTORS.md) for details on our code of conduct and the process 
+for submitting pull requests.
 
 ## License
 
-MIT 
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
