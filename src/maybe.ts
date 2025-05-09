@@ -26,7 +26,7 @@ function withDefault<T, TResult>(defaultValue: TResult, maybe: Maybe<T>) {
   return isJust(maybe) ? maybe.value : defaultValue;
 }
 
-function when<T, TResult>(maybe: Maybe<T>, pattern: Pattern<T, TResult>): TResult {
+function when<T, TResult>(pattern: Pattern<T, TResult>, maybe: Maybe<T>): TResult {
   const { nothing, just, _ = Function.prototype } = pattern;
 
   switch (maybe.type) {

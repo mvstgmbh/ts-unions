@@ -48,7 +48,7 @@ function withDefault<T, TResult>(defaultValue: TResult, remoteData: RemoteData<T
   return isSuccess(remoteData) ? remoteData.value : defaultValue;
 }
 
-function when<T, TResult>(remoteData: RemoteData<T>, pattern: Pattern<T, TResult>): TResult {
+function when<T, TResult>(pattern: Pattern<T, TResult>, remoteData: RemoteData<T>): TResult {
   const { notAsked, loading, success, error, _ = Function.prototype } = pattern;
 
   switch (remoteData.type) {

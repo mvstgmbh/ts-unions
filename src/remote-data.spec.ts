@@ -35,58 +35,73 @@ describe("RemoteData", () => {
   describe("when", () => {
     it("should handle NotAsked case", () => {
       const value = RD.notAsked<number>();
-      const result = RD.when(value, {
-        notAsked: () => "NotAsked",
-        loading: () => "Loading",
-        success: () => "Success",
-        error: () => "Error",
-      });
+      const result = RD.when(
+        {
+          notAsked: () => "NotAsked",
+          loading: () => "Loading",
+          success: () => "Success",
+          error: () => "Error",
+        },
+        value,
+      );
       expect(result).toBe("NotAsked");
     });
 
     it("should handle Loading case", () => {
       const value = RD.loading<number>();
-      const result = RD.when(value, {
-        notAsked: () => "NotAsked",
-        loading: () => "Loading",
-        success: () => "Success",
-        error: () => "Error",
-      });
+      const result = RD.when(
+        {
+          notAsked: () => "NotAsked",
+          loading: () => "Loading",
+          success: () => "Success",
+          error: () => "Error",
+        },
+        value,
+      );
       expect(result).toBe("Loading");
     });
 
     it("should handle Success case", () => {
       const value = RD.success(42);
-      const result = RD.when(value, {
-        notAsked: () => "NotAsked",
-        loading: () => "Loading",
-        success: (x) => `Success: ${x}`,
-        error: () => "Error",
-      });
+      const result = RD.when(
+        {
+          notAsked: () => "NotAsked",
+          loading: () => "Loading",
+          success: (x) => `Success: ${x}`,
+          error: () => "Error",
+        },
+        value,
+      );
       expect(result).toBe("Success: 42");
     });
 
     it("should handle Error case", () => {
       const err = new Error("test");
       const value = RD.error<number>(err);
-      const result = RD.when(value, {
-        notAsked: () => "NotAsked",
-        loading: () => "Loading",
-        success: () => "Success",
-        error: (e) => `Error: ${e.message}`,
-      });
+      const result = RD.when(
+        {
+          notAsked: () => "NotAsked",
+          loading: () => "Loading",
+          success: () => "Success",
+          error: (e) => `Error: ${e.message}`,
+        },
+        value,
+      );
       expect(result).toBe("Error: test");
     });
 
     it("should use fallback case if provided", () => {
       const value = RD.success(42);
-      const result = RD.when(value, {
-        notAsked: () => "NotAsked",
-        loading: () => "Loading",
-        success: (x) => `Success: ${x}`,
-        error: () => "Error",
-        _: () => "Fallback",
-      });
+      const result = RD.when(
+        {
+          notAsked: () => "NotAsked",
+          loading: () => "Loading",
+          success: (x) => `Success: ${x}`,
+          error: () => "Error",
+          _: () => "Fallback",
+        },
+        value,
+      );
       expect(result).toBe("Success: 42");
     });
   });

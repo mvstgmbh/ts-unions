@@ -22,21 +22,21 @@ describe("Maybe", () => {
   describe("when", () => {
     it("should handle Just case", () => {
       const value = M.just(42);
-      const result = M.when(value, { just: (x) => x * 2, nothing: () => 0 });
+      const result = M.when({ just: (x) => x * 2, nothing: () => 0 }, value);
 
       expect(result).toBe(84);
     });
 
     it("should handle Nothing case", () => {
       const value = M.nothing<number>();
-      const result = M.when(value, { just: (x) => x * 2, nothing: () => 0 });
+      const result = M.when({ just: (x) => x * 2, nothing: () => 0 }, value);
 
       expect(result).toBe(0);
     });
 
     it("should use fallback case if provided", () => {
       const value = M.just(42);
-      const result = M.when(value, { just: (x) => x * 2, nothing: () => 0, _: () => -1 });
+      const result = M.when({ just: (x) => x * 2, nothing: () => 0, _: () => -1 }, value);
 
       expect(result).toBe(84);
     });
