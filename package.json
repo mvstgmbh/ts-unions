@@ -14,7 +14,7 @@
     "build": "tsc",
     "test": "vitest",
     "prepare": "npm run build",
-    "lint": "eslint . --fix"
+    "lint": "eslint ."
   },
   "keywords": [
     "typescript",
