@@ -19,31 +19,42 @@ The `Maybe` type represents a value that might or might not exist. It's useful f
 nullable values in a type-safe way.
 
 ```typescript
-import { Maybe, just, nothing, when } from "@mvst/ts-unions";
+import { Maybe, M } from "@mvst/ts-unions";
 
 // Creating Maybe values
-const someValue: Maybe<number> = just(42);
-const noValue: Maybe<number> = nothing();
+const someValue: Maybe<number> = M.just(42);
+const noValue: Maybe<number> = M.nothing();
 
 // Pattern matching
-const result = when(someValue, {
+M.when(someValue, {
   just: (value) => `Value is ${value}`,
   nothing: () => "No value"
 });
 
+M.when(someValue, {
+  _: () => "This is the fallack case"
+});
+
+
 // Transforming values
-const doubled = map((x) => x * 2, someValue);
+const doubled: Maybe<number> = M.map((x) => x * 2, someValue);
+
+// Chaining operations
+const chained: Maybe<number> = M.andThen((x) => M.just(x + 1), someValue);
+
+// Unwrapping values
+const value: number = M.withDefault(0, someValue); // Unwraps the value or returns 0 if nothing
 ```
 
 #### Maybe API
 
-- `just<T>(value: T): Maybe<T>` - Creates a Maybe with a value
-- `nothing<T>(): Maybe<T>` - Creates a Maybe without a value
-- `when<T, R>(maybe: Maybe<T>, pattern: { just?: (value: T) => R, nothing?: () => R, _?: () => R }): R` - Pattern matching
-- `map<T, R>(fn: (value: T) => R, maybe: Maybe<T>): Maybe<R>` - Transform the value if it exists
-- `andThen<T, R>(fn: (value: T) => Maybe<R>, maybe: Maybe<T>): Maybe<R>` - Chain Maybe operations
-- `isJust<T>(maybe: Maybe<T>): boolean` - Check if Maybe has a value
-- `isNothing<T>(maybe: Maybe<T>): boolean` - Check if Maybe has no value
+- `M.just(value: T): Maybe<T>` - Creates a Maybe with a value
+- `M.nothing(): Maybe<T>` - Creates a Maybe without a value
+- `M.when(pattern: Pattern , maybe: Maybe<T>): R` - Pattern matching
+- `M.map(fn: (value: T) => R, maybe: Maybe<T>): Maybe<R>` - Transform the value if it exists
+- `M.andThen(fn: (value: T) => Maybe<R>, maybe: Maybe<T>): Maybe<R>` - Chain Maybe operations
+- `M.isJust(maybe: Maybe<T>): boolean` - Check if Maybe has a value
+- `M.isNothing(maybe: Maybe<T>): boolean` - Check if Maybe has no value
 
 ### RemoteData Type
 
@@ -51,49 +62,57 @@ The `RemoteData` type represents the state of a remote data operation. It's perf
 handling API calls and async operations.
 
 ```typescript
-import { RemoteData, notAsked, loading, success, error, when } from "@mvst/ts-unions";
+import { RemoteData, RD } from "@mvst/ts-unions";
 
 // Creating RemoteData values
-const data: RemoteData<string> = notAsked();
-const loadingData: RemoteData<string> = loading();
-const successData: RemoteData<string> = success("Data loaded");
-const errorData: RemoteData<string> = error(new Error("Failed to load"));
+const data: RemoteData<string> = RD.notAsked();
+const loadingData: RemoteData<string> = RD.loading();
+const successData: RemoteData<string> = RD.success("Data loaded");
+const errorData: RemoteData<string> = RD.error(new Error("Failed to load"));
 
 // Pattern matching
-const result = when(data, {
+RD.when(data, {
   notAsked: () => "Not started",
   loading: () => "Loading...",
   success: (value) => `Data: ${value}`,
   error: (err) => `Error: ${err.message}`
 });
 
+RD.when(data, {
+  success: (value) => `Data: ${value}`,
+  _: () => "This is the fallback case, all other cases are handled here"
+});
+
 // Transforming values
-const transformed = map((value) => value.toUpperCase(), successData);
+const transformed = RD.map((value) => value.toUpperCase(), successData);
+
+// Chaining operations
+const chained = RD.andThen((value) => RD.success(value + "!!!"), successData);
+
+// Unwrapping values
+const unwrapped = RD.withDefault("No data", successData); // Unwraps the value or returns "No data" if not success
 ```
 
 #### RemoteData API
 
-- `notAsked<T>(): RemoteData<T>` - Initial state
-- `loading<T>(): RemoteData<T>` - Loading state
-- `success<T>(value: T): RemoteData<T>` - Success state with value
-- `error<T>(error: Error): RemoteData<T>` - Error state with error
-- `when<T, R>(data: RemoteData<T>, pattern: { notAsked?: () => R, loading?: () => R, success?: (value: T) => R, error?: (error: Error) => R, _?: () => R }): R` - Pattern matching
-- `map<T, R>(fn: (value: T) => R, data: RemoteData<T>): RemoteData<R>` - Transform success value
-- `andThen<T, R>(fn: (value: T) => RemoteData<R>, data: RemoteData<T>): RemoteData<R>` - Chain RemoteData operations
-- `isNotAsked<T>(data: RemoteData<T>): boolean` - Check if not asked
-- `isLoading<T>(data: RemoteData<T>): boolean` - Check if loading
-- `isSuccess<T>(data: RemoteData<T>): boolean` - Check if success
-- `isError<T>(data: RemoteData<T>): boolean` - Check if error
+- `RD.notAsked(): RemoteData<T>` - Initial state
+- `RD.loading(): RemoteData<T>` - Loading state
+- `RD.success(value: T): RemoteData<T>` - Success state with value
+- `RD.error(error: Error): RemoteData<T>` - Error state with error
+- `RD.when(pattern: Pattern, data: RemoteData<T>): R` - Pattern matching
+- `RD.map(fn: (value: T) => R, data: RemoteData<T>): RemoteData<R>` - Transform success value
+- `RD.andThen(fn: (value: T) => RemoteData<R>, data: RemoteData<T>): RemoteData<R>` - Chain RemoteData operations
+- `RD.isNotAsked(data: RemoteData<T>): boolean` - Check if not asked
+- `RD.isLoading(data: RemoteData<T>): boolean` - Check if loading
+- `RD.isSuccess(data: RemoteData<T>): boolean` - Check if success
+- `RD.isError(data: RemoteData<T>): boolean` - Check if error
 
-## Type Safety
+## Features
 
-Both `Maybe` and `RemoteData` are implemented as discriminated unions, providing full type safety 
-and exhaustive pattern matching. TypeScript will ensure you handle all possible cases when using 
-pattern matching.
-
-All the values are immutable, meaning that operations like `map` and `andThen` return new instances
-instead of modifying the original value. Also, the library is designed to be tree-shakable and the
-values are serializable.
+- All the values are immutable, meaning that operations like `map` and `andThen` return new instances
+instead of modifying the original value. 
+- The library is designed to be tree-shakable
+- All the values are serializable, meaning that you can easily convert them to JSON and back.
 
 ## Contributing
 
