@@ -2,7 +2,7 @@
 
 TypeScript union types for Maybe and RemoteData with pattern matching.
 
-[![npm version](https://badge.fury.io/js/ts-unions.svg)](https://badge.fury.io/js/ts-unions)
+[![npm version](https://img.shields.io/npm/v/@mvst/ts-unions)](https://www.npmjs.com/package/@mvst/ts-unions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Installation
@@ -113,6 +113,76 @@ const unwrapped = RD.withDefault("No data", successData); // Unwraps the value o
 instead of modifying the original value. 
 - The library is designed to be tree-shakable
 - All the values are serializable, meaning that you can easily convert them to JSON and back.
+- All the functions in the libray are curries, which means they can be parially applied.
+
+## Currying and Composition
+
+This makes it easy to create reusable functions and compose them together. The library also provides `compose` and `pipe` utilities to help with function composition, although you might already have access to similar functions if you're using any functional programming library.
+
+### Currying Examples
+
+#### Maybe
+
+```typescript
+import { Maybe, M } from "@mvst/ts-unions";
+
+// Create reusable functions by partially applying map
+const double = M.map((x: number) => x * 2);
+const addOne = M.map((x: number) => x + 1);
+
+// Use them with different Maybe values
+const value1 = M.just(42);
+const value2 = M.just(10);
+
+const doubled1 = double(value1); // Just(84)
+const doubled2 = double(value2); // Just(20)
+
+// Compose functions using pipe
+const doubleAndAddOne = pipe(double, addOne);
+const result = doubleAndAddOne(value1); // Just(85)
+```
+
+#### RemoteData
+
+```typescript
+import { RemoteData, RD } from "@mvst/ts-unions";
+
+// Create reusable functions by partially applying map
+const format = RD.map((value: string) => value.toUpperCase());
+const addTimestamp = RD.map((value: string) => `${value} (${new Date().toISOString()})`);
+
+// Use them with different RemoteData values
+const data = RD.success("Hello");
+
+const formatted = format(data); // Success("HELLO")
+
+// Compose functions using pipe
+const formatAndAddTimestamp = pipe(format, addTimestamp);
+const result = formatAndAddTimestamp(data1); // Success("HELLO (2024-03-21T12:00:00.000Z)")
+```
+
+The ability to curry functions and compose them together makes it easy to create reusable transformations that can be applied to any Maybe or RemoteData value. This is particularly useful when you have a set of common transformations that you want to apply in different combinations.
+
+For example, you might have a set of validation functions that you want to apply to user input:
+
+```typescript
+import { Maybe, M } from "@mvst/ts-unions";
+
+const validateEmail = (email: string): Maybe<string> => 
+  email.includes('@') ? M.just(email) : M.nothing();
+
+const validatePassword = (password: string): Maybe<string> =>
+  password.length >= 8 ? M.just(password) : M.nothing();
+
+// Compose validation functions
+const validateUserInput = pipe(
+  validateEmail,
+  M.andThen(validatePassword)
+);
+
+const result = validateUserInput("user@example.com"); // Just("user@example.com")
+const invalid = validateUserInput("invalid"); // Nothing
+```
 
 ## Contributing
 

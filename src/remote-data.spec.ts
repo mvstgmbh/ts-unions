@@ -228,7 +228,7 @@ describe("RemoteData", () => {
   describe("curried functions", () => {
     describe("map", () => {
       it("should work with partial application", () => {
-        const double = RD.map<number, number>((x) => x * 2);
+        const double = RD.map((x: number) => x * 2);
         const value = RD.success(42);
         const result = double(value);
 
@@ -245,8 +245,8 @@ describe("RemoteData", () => {
 
     describe("andThen", () => {
       it("should work with partial application", () => {
-        const double = RD.andThen((x: number) => RD.success(x * 2));
         const value = RD.success(42);
+        const double = RD.andThen((x: number) => RD.success(x * 2));
         const result = double(value);
 
         expect(result).toEqual({ type: "Success", value: 84 });
@@ -254,7 +254,7 @@ describe("RemoteData", () => {
 
       it("should work with full application", () => {
         const value = RD.success(42);
-        const result = RD.andThen((x: number) => RD.success(x * 2), value);
+        const result = RD.andThen((x) => RD.success(x * 2), value);
 
         expect(result).toEqual({ type: "Success", value: 84 });
       });
