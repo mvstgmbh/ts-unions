@@ -1,3 +1,5 @@
+import { curry } from "./utils";
+
 export type RemoteData<T> =
   | { type: "Error"; error: Error }
   | { type: "Loading" }
@@ -44,11 +46,27 @@ function isNotAsked<T>(remoteData: RemoteData<T>) {
   return remoteData.type === "NotAsked";
 }
 
-function withDefault<T, TResult>(defaultValue: TResult, remoteData: RemoteData<T>) {
-  return isSuccess(remoteData) ? remoteData.value : defaultValue;
+interface CurryWithDefault {
+  <T, TResult>(defaultValue: TResult, remoteData: RemoteData<T>): TResult;
+  <T, TResult>(defaultValue: TResult): (remoteData: RemoteData<T>) => TResult;
 }
 
-function when<T, TResult>(pattern: Pattern<T, TResult>, remoteData: RemoteData<T>): TResult {
+const withDefault: CurryWithDefault = curry(function withDefault<T, TResult>(
+  defaultValue: TResult,
+  remoteData: RemoteData<T>,
+) {
+  return isSuccess(remoteData) ? remoteData.value : defaultValue;
+});
+
+interface CurriedWhen {
+  <T, TResult>(pattern: Pattern<T, TResult>, remoteData: RemoteData<T>): TResult;
+  <T, TResult>(pattern: Pattern<T, TResult>): (remoteData: RemoteData<T>) => TResult;
+}
+
+const when: CurriedWhen = curry(function when<T, TResult>(
+  pattern: Pattern<T, TResult>,
+  remoteData: RemoteData<T>,
+): TResult {
   const { notAsked, loading, success, error, _ = Function.prototype } = pattern;
 
   switch (remoteData.type) {
@@ -64,15 +82,31 @@ function when<T, TResult>(pattern: Pattern<T, TResult>, remoteData: RemoteData<T
     case "Error":
       return typeof error === "function" ? error(remoteData.error) : _();
   }
+});
+
+interface CurriedMap {
+  <T, R>(fn: (value: T) => R, remoteData: RemoteData<T>): RemoteData<R>;
+  <T, R>(fn: (value: T) => R): (remoteData: RemoteData<T>) => RemoteData<R>;
 }
 
-function map<T, TResult>(fn: (value: T) => TResult, remoteData: RemoteData<T>) {
+const map: CurriedMap = curry(function map<T, TResult>(
+  fn: (value: T) => TResult,
+  remoteData: RemoteData<T>,
+) {
   return isSuccess(remoteData) ? success(fn(remoteData.value)) : remoteData;
+});
+
+interface CurriedAndThen {
+  <T, R>(fn: (value: T) => RemoteData<R>, remoteData: RemoteData<T>): RemoteData<R>;
+  <T, R>(fn: (value: T) => RemoteData<R>): (remoteData: RemoteData<T>) => RemoteData<R>;
 }
 
-function andThen<T, TResult>(fn: (value: T) => RemoteData<TResult>, remoteData: RemoteData<T>) {
+const andThen: CurriedAndThen = curry(function andThen<T, TResult>(
+  fn: (value: T) => RemoteData<TResult>,
+  remoteData: RemoteData<T>,
+) {
   return isSuccess(remoteData) ? fn(remoteData.value) : remoteData;
-}
+});
 
 export {
   andThen,

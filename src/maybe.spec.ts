@@ -85,19 +85,100 @@ describe("Maybe", () => {
     it("should return the value when Maybe is Just", () => {
       const value = M.just(42);
       const result = M.withDefault(0, value);
+
       expect(result).toBe(42);
     });
 
     it("should return the default value when Maybe is Nothing", () => {
       const value = M.nothing<number>();
       const result = M.withDefault(0, value);
+
       expect(result).toBe(0);
     });
 
     it("should work with different types", () => {
       const value = M.nothing<number>();
       const result = M.withDefault("default", value);
+
       expect(result).toBe("default");
+    });
+  });
+
+  describe("curried functions", () => {
+    describe("map", () => {
+      it("should work with partial application", () => {
+        const double = M.map((x: number) => x * 2);
+        const value = M.just(42);
+        const result = double(value);
+
+        expect(result).toEqual({ type: "Just", value: 84 });
+      });
+
+      it("should work with full application", () => {
+        const value = M.just(42);
+        const result = M.map((x: number) => x * 2, value);
+
+        expect(result).toEqual({ type: "Just", value: 84 });
+      });
+    });
+
+    describe("andThen", () => {
+      it("should work with partial application", () => {
+        const double = M.andThen((x: number) => M.just(x * 2));
+        const value = M.just(42);
+        const result = double(value);
+
+        expect(result).toEqual({ type: "Just", value: 84 });
+      });
+
+      it("should work with full application", () => {
+        const value = M.just(42);
+        const result = M.andThen((x: number) => M.just(x * 2), value);
+
+        expect(result).toEqual({ type: "Just", value: 84 });
+      });
+    });
+
+    describe("when", () => {
+      it("should work with partial application", () => {
+        const pattern = {
+          just: (x: number) => x * 2,
+          nothing: () => 0,
+        };
+        const matcher = M.when(pattern);
+        const value = M.just(42);
+        const result = matcher(value);
+
+        expect(result).toBe(84);
+      });
+
+      it("should work with full application", () => {
+        const pattern = {
+          just: (x: number) => x * 2,
+          nothing: () => 0,
+        };
+        const value = M.just(42);
+        const result = M.when(pattern, value);
+
+        expect(result).toBe(84);
+      });
+    });
+
+    describe("withDefault", () => {
+      it("should work with partial application", () => {
+        const withZero = M.withDefault(0);
+        const value = M.just(42);
+        const result = withZero(value);
+
+        expect(result).toBe(42);
+      });
+
+      it("should work with full application", () => {
+        const value = M.just(42);
+        const result = M.withDefault(0, value);
+
+        expect(result).toBe(42);
+      });
     });
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@mvst/ts-unions",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "TypeScript union types for Maybe and RemoteData with pattern matching",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,8 @@
     "build": "tsc",
     "test": "vitest",
     "prepare": "npm run build",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "typescript",

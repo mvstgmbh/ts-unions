@@ -191,18 +191,21 @@ describe("RemoteData", () => {
     it("should return the value when RemoteData is Success", () => {
       const value = RD.success(42);
       const result = RD.withDefault(0, value);
+
       expect(result).toBe(42);
     });
 
     it("should return the default value when RemoteData is NotAsked", () => {
       const value = RD.notAsked<number>();
       const result = RD.withDefault(0, value);
+
       expect(result).toBe(0);
     });
 
     it("should return the default value when RemoteData is Loading", () => {
       const value = RD.loading<number>();
       const result = RD.withDefault(0, value);
+
       expect(result).toBe(0);
     });
 
@@ -210,13 +213,97 @@ describe("RemoteData", () => {
       const err = new Error("test");
       const value = RD.error<number>(err);
       const result = RD.withDefault(0, value);
+
       expect(result).toBe(0);
     });
 
     it("should work with different types", () => {
       const value = RD.notAsked<number>();
       const result = RD.withDefault("default", value);
+
       expect(result).toBe("default");
+    });
+  });
+
+  describe("curried functions", () => {
+    describe("map", () => {
+      it("should work with partial application", () => {
+        const double = RD.map<number, number>((x) => x * 2);
+        const value = RD.success(42);
+        const result = double(value);
+
+        expect(result).toEqual({ type: "Success", value: 84 });
+      });
+
+      it("should work with full application", () => {
+        const value = RD.success(42);
+        const result = RD.map((x) => x * 2, value);
+
+        expect(result).toEqual({ type: "Success", value: 84 });
+      });
+    });
+
+    describe("andThen", () => {
+      it("should work with partial application", () => {
+        const double = RD.andThen((x: number) => RD.success(x * 2));
+        const value = RD.success(42);
+        const result = double(value);
+
+        expect(result).toEqual({ type: "Success", value: 84 });
+      });
+
+      it("should work with full application", () => {
+        const value = RD.success(42);
+        const result = RD.andThen((x: number) => RD.success(x * 2), value);
+
+        expect(result).toEqual({ type: "Success", value: 84 });
+      });
+    });
+
+    describe("when", () => {
+      it("should work with partial application", () => {
+        const pattern = {
+          notAsked: () => "NotAsked",
+          loading: () => "Loading",
+          success: (x: number) => `Success: ${x}`,
+          error: (e: Error) => `Error: ${e.message}`,
+        };
+        const matcher = RD.when(pattern);
+        const value = RD.success(42);
+        const result = matcher(value);
+
+        expect(result).toBe("Success: 42");
+      });
+
+      it("should work with full application", () => {
+        const pattern = {
+          notAsked: () => "NotAsked",
+          loading: () => "Loading",
+          success: (x: number) => `Success: ${x}`,
+          error: (e: Error) => `Error: ${e.message}`,
+        };
+        const value = RD.success(42);
+        const result = RD.when(pattern, value);
+
+        expect(result).toBe("Success: 42");
+      });
+    });
+
+    describe("withDefault", () => {
+      it("should work with partial application", () => {
+        const withZero = RD.withDefault(1);
+        const value = RD.success(42);
+        const result = withZero(value);
+
+        expect(result).toBe(42);
+      });
+
+      it("should work with full application", () => {
+        const value = RD.success(42);
+        const result = RD.withDefault(0, value);
+
+        expect(result).toBe(42);
+      });
     });
   });
 });
