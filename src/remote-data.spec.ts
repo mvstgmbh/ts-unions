@@ -216,13 +216,6 @@ describe("RemoteData", () => {
 
       expect(result).toBe(0);
     });
-
-    it("should work with different types", () => {
-      const value = RD.notAsked<number>();
-      const result = RD.withDefault("default", value);
-
-      expect(result).toBe("default");
-    });
   });
 
   describe("curried functions", () => {

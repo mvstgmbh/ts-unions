@@ -95,13 +95,6 @@ describe("Maybe", () => {
 
       expect(result).toBe(0);
     });
-
-    it("should work with different types", () => {
-      const value = M.nothing<number>();
-      const result = M.withDefault("default", value);
-
-      expect(result).toBe("default");
-    });
   });
 
   describe("curried functions", () => {

@@ -47,8 +47,8 @@ function isNotAsked<T>(remoteData: RemoteData<T>) {
 }
 
 interface CurryWithDefault {
-  <T, TResult>(defaultValue: TResult, remoteData: RemoteData<T>): TResult;
-  <T, TResult>(defaultValue: TResult): (remoteData: RemoteData<T>) => TResult;
+  <T>(defaultValue: T, remoteData: RemoteData<T>): T;
+  <T>(defaultValue: T): (remoteData: RemoteData<T>) => T;
 }
 
 const withDefault: CurryWithDefault = curry(function withDefault<T, TResult>(
@@ -85,8 +85,8 @@ const when: CurriedWhen = curry(function when<T, TResult>(
 });
 
 interface CurriedMap {
-  <T, R>(fn: (value: T) => R, remoteData: RemoteData<T>): RemoteData<R>;
-  <T, R>(fn: (value: T) => R): (remoteData: RemoteData<T>) => RemoteData<R>;
+  <T, TResult>(fn: (value: T) => TResult, remoteData: RemoteData<T>): RemoteData<TResult>;
+  <T, TResult>(fn: (value: T) => TResult): (remoteData: RemoteData<T>) => RemoteData<TResult>;
 }
 
 const map: CurriedMap = curry(function map<T, TResult>(
@@ -97,8 +97,13 @@ const map: CurriedMap = curry(function map<T, TResult>(
 });
 
 interface CurriedAndThen {
-  <T, R>(fn: (value: T) => RemoteData<R>, remoteData: RemoteData<T>): RemoteData<R>;
-  <T, R>(fn: (value: T) => RemoteData<R>): (remoteData: RemoteData<T>) => RemoteData<R>;
+  <T, TResult>(
+    fn: (value: T) => RemoteData<TResult>,
+    remoteData: RemoteData<T>,
+  ): RemoteData<TResult>;
+  <T, TResult>(
+    fn: (value: T) => RemoteData<TResult>,
+  ): (remoteData: RemoteData<T>) => RemoteData<TResult>;
 }
 
 const andThen: CurriedAndThen = curry(function andThen<T, TResult>(

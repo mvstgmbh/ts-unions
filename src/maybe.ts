@@ -25,8 +25,8 @@ function isNothing<T>(maybe: Maybe<T>) {
 }
 
 interface CurriedWithDefault {
-  <T, TResult>(defaultValue: TResult, maybe: Maybe<T>): TResult;
-  <T, TResult>(defaultValue: TResult): (maybe: Maybe<T>) => TResult;
+  <T>(defaultValue: T, maybe: Maybe<T>): T;
+  <T>(defaultValue: T): (maybe: Maybe<T>) => T;
 }
 
 const withDefault: CurriedWithDefault = curry(function withDefault<T, TResult>(

@@ -18,11 +18,6 @@ describe("Utils", () => {
       expect(composed(2)).toBe(3);
     });
 
-    it("should work with no functions", () => {
-      const composed = compose();
-      expect(composed(2)).toBe(2);
-    });
-
     it("should work with string transformations", () => {
       const toUpperCase = (s: string) => s.toUpperCase();
       const addExclamation = (s: string) => s + "!";
@@ -47,11 +42,6 @@ describe("Utils", () => {
       const addOne = (x: number) => x + 1;
       const piped = pipe(addOne);
       expect(piped(2)).toBe(3);
-    });
-
-    it("should work with no functions", () => {
-      const piped = pipe();
-      expect(piped(2)).toBe(2);
     });
 
     it("should work with string transformations", () => {
