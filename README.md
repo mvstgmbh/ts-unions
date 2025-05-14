@@ -109,15 +109,16 @@ const unwrapped = RD.withDefault("No data", successData); // Unwraps the value o
 
 ## Features
 
-- All the values are immutable, meaning that operations like `map` and `andThen` return new instances
-instead of modifying the original value. 
-- The library is designed to be tree-shakable
-- All the values are serializable, meaning that you can easily convert them to JSON and back.
-- All the functions in the libray are curries, which means they can be parially applied.
+- The library is tree-shakable
+- All the values are immutable and that operations like `map` and `andThen` never modify the original value.
+- All the values are serializable (e.g.: you can easily store them in local storage or send them over the network).
+- All the functions in the libray are curried, so you can partially apply them and create reusable functions.
 
 ## Currying and Composition
 
-This makes it easy to create reusable functions and compose them together. The library also provides `compose` and `pipe` utilities to help with function composition, although you might already have access to similar functions if you're using any functional programming library.
+This makes it easy to create reusable functions and compose them together. 
+The library also provides `compose` and `pipe` utilities to help with function composition, although 
+you might already have access to similar functions if you're using any functional programming library.
 
 ### Currying Examples
 
@@ -159,29 +160,6 @@ const formatted = format(data); // Success("HELLO")
 // Compose functions using pipe
 const formatAndAddTimestamp = pipe(format, addTimestamp);
 const result = formatAndAddTimestamp(data1); // Success("HELLO (2024-03-21T12:00:00.000Z)")
-```
-
-The ability to curry functions and compose them together makes it easy to create reusable transformations that can be applied to any Maybe or RemoteData value. This is particularly useful when you have a set of common transformations that you want to apply in different combinations.
-
-For example, you might have a set of validation functions that you want to apply to user input:
-
-```typescript
-import { Maybe, M } from "@mvst/ts-unions";
-
-const validateEmail = (email: string): Maybe<string> => 
-  email.includes('@') ? M.just(email) : M.nothing();
-
-const validatePassword = (password: string): Maybe<string> =>
-  password.length >= 8 ? M.just(password) : M.nothing();
-
-// Compose validation functions
-const validateUserInput = pipe(
-  validateEmail,
-  M.andThen(validatePassword)
-);
-
-const result = validateUserInput("user@example.com"); // Just("user@example.com")
-const invalid = validateUserInput("invalid"); // Nothing
 ```
 
 ## Contributing
