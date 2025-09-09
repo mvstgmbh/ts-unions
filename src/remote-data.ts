@@ -1,71 +1,71 @@
 import { curry } from "./utils";
 
-export type RemoteData<T> =
-  | { type: "Error"; error: Error }
+export type RemoteData<TSuccess, TError = Error> =
+  | { type: "Error"; error: TError }
   | { type: "Loading" }
   | { type: "NotAsked" }
-  | { type: "Success"; value: T };
+  | { type: "Success"; value: TSuccess };
 
-type Pattern<T, TResult> = {
+type Pattern<TSuccess, TError, TResult> = {
   _?: () => TResult;
-  error?: (error: Error) => TResult;
+  error?: (error: TError) => TResult;
   loading?: () => TResult;
   notAsked?: () => TResult;
-  success?: (value: T) => TResult;
+  success?: (value: TSuccess) => TResult;
 };
 
-function notAsked<T>(): RemoteData<T> {
+function notAsked<TSuccess, TError = Error>(): RemoteData<TSuccess, TError> {
   return { type: "NotAsked" };
 }
 
-function loading<T>(): RemoteData<T> {
+function loading<TSuccess, TError = Error>(): RemoteData<TSuccess, TError> {
   return { type: "Loading" };
 }
 
-function success<T>(value: T): RemoteData<T> {
+function success<TSuccess, TError = Error>(value: TSuccess): RemoteData<TSuccess, TError> {
   return { type: "Success", value };
 }
 
-function error<T>(error: Error): RemoteData<T> {
+function error<TSuccess, TError = Error>(error: TError): RemoteData<TSuccess, TError> {
   return { type: "Error", error };
 }
 
-function isSuccess<T>(remoteData: RemoteData<T>) {
+function isSuccess<TSuccess, TError = Error>(remoteData: RemoteData<TSuccess, TError>) {
   return remoteData.type === "Success";
 }
 
-function isError<T>(remoteData: RemoteData<T>) {
+function isError<TSuccess, TError = Error>(remoteData: RemoteData<TSuccess, TError>) {
   return remoteData.type === "Error";
 }
 
-function isLoading<T>(remoteData: RemoteData<T>) {
+function isLoading<TSuccess, TError = Error>(remoteData: RemoteData<TSuccess, TError>) {
   return remoteData.type === "Loading";
 }
 
-function isNotAsked<T>(remoteData: RemoteData<T>) {
+function isNotAsked<TSuccess, TError = Error>(remoteData: RemoteData<TSuccess, TError>) {
   return remoteData.type === "NotAsked";
 }
 
 interface CurryWithDefault {
-  <T>(defaultValue: T, remoteData: RemoteData<T>): T;
-  <T>(defaultValue: T): (remoteData: RemoteData<T>) => T;
+  <TSuccess, TError = Error>(defaultValue: TSuccess, remoteData: RemoteData<TSuccess, TError>): TSuccess;
+  <TSuccess, TError = Error>(defaultValue: TSuccess): (remoteData: RemoteData<TSuccess, TError>) => TSuccess;
 }
 
-const withDefault: CurryWithDefault = curry(function withDefault<T, TResult>(
+const withDefault: CurryWithDefault = curry(function withDefault<TSuccess, TResult, TError = Error>(
   defaultValue: TResult,
-  remoteData: RemoteData<T>,
+  remoteData: RemoteData<TSuccess, TError>,
 ) {
   return isSuccess(remoteData) ? remoteData.value : defaultValue;
 });
 
 interface CurriedWhen {
-  <T, TResult>(pattern: Pattern<T, TResult>, remoteData: RemoteData<T>): TResult;
-  <T, TResult>(pattern: Pattern<T, TResult>): (remoteData: RemoteData<T>) => TResult;
+  <TSuccess, TError, TResult>(pattern: Pattern<TSuccess, TError, TResult>, remoteData: RemoteData<TSuccess, TError>): TResult;
+  <TSuccess, TError, TResult>(pattern: Pattern<TSuccess, TError, TResult>): (remoteData: RemoteData<TSuccess, TError>) => TResult;
 }
 
-const when: CurriedWhen = curry(function when<T, TResult>(
-  pattern: Pattern<T, TResult>,
-  remoteData: RemoteData<T>,
+const when: CurriedWhen = curry(function when<TSuccess, TError, TResult>(
+  pattern: Pattern<TSuccess, TError, TResult>,
+  remoteData: RemoteData<TSuccess, TError>,
 ): TResult {
   const { notAsked, loading, success, error, _ = Function.prototype } = pattern;
 
@@ -85,33 +85,33 @@ const when: CurriedWhen = curry(function when<T, TResult>(
 });
 
 interface CurriedMap {
-  <T, TResult>(fn: (value: T) => TResult, remoteData: RemoteData<T>): RemoteData<TResult>;
-  <T, TResult>(fn: (value: T) => TResult): (remoteData: RemoteData<T>) => RemoteData<TResult>;
+  <TSuccess, TError, TResult>(fn: (value: TSuccess) => TResult, remoteData: RemoteData<TSuccess, TError>): RemoteData<TResult, TError>;
+  <TSuccess, TError, TResult>(fn: (value: TSuccess) => TResult): (remoteData: RemoteData<TSuccess, TError>) => RemoteData<TResult, TError>;
 }
 
-const map: CurriedMap = curry(function map<T, TResult>(
-  fn: (value: T) => TResult,
-  remoteData: RemoteData<T>,
+const map: CurriedMap = curry(function map<TSuccess, TError, TResult>(
+  fn: (value: TSuccess) => TResult,
+  remoteData: RemoteData<TSuccess, TError>,
 ) {
   return isSuccess(remoteData) ? success(fn(remoteData.value)) : remoteData;
 });
 
 interface CurriedAndThen {
-  <T, TResult>(
-    fn: (value: T) => RemoteData<TResult>,
-    remoteData: RemoteData<T>,
-  ): RemoteData<TResult>;
-  <T, TResult>(
-    fn: (value: T) => RemoteData<TResult>,
-  ): (remoteData: RemoteData<T>) => RemoteData<TResult>;
+  <TSuccess, TError, TResult>(
+    fn: (value: TSuccess) => RemoteData<TResult, TError>,
+    remoteData: RemoteData<TSuccess, TError>,
+  ): RemoteData<TResult, TError>;
+  <TSuccess, TError, TResult>(
+    fn: (value: TSuccess) => RemoteData<TResult, TError>,
+  ): (remoteData: RemoteData<TSuccess, TError>) => RemoteData<TResult, TError>;
 }
 
-const andThen: CurriedAndThen = curry(function andThen<T, TResult>(
-  fn: (value: T) => RemoteData<TResult>,
-  remoteData: RemoteData<T>,
+const andThen: CurriedAndThen = curry(function andThen<TSuccess, TError, TResult>(
+  fn: (value: TSuccess) => RemoteData<TResult, TError>,
+  remoteData: RemoteData<TSuccess, TError>,
 ) {
   return isSuccess(remoteData) ? fn(remoteData.value) : remoteData;
-});
+};
 
 export {
   andThen,
