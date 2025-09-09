@@ -1,4 +1,4 @@
-import { curry } from "./utils";
+import { curry } from "./utils.js";
 
 export type RemoteData<TSuccess, TError = Error> =
   | { type: "Error"; error: TError }

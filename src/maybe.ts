@@ -1,4 +1,4 @@
-import { curry } from "./utils";
+import { curry } from "./utils.js";
 
 export type Maybe<T> = { type: "Nothing" } | { type: "Just"; value: T };
 
