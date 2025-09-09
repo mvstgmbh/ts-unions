@@ -47,8 +47,13 @@ function isNotAsked<TSuccess, TError = Error>(remoteData: RemoteData<TSuccess, T
 }
 
 interface CurryWithDefault {
-  <TSuccess, TError = Error>(defaultValue: TSuccess, remoteData: RemoteData<TSuccess, TError>): TSuccess;
-  <TSuccess, TError = Error>(defaultValue: TSuccess): (remoteData: RemoteData<TSuccess, TError>) => TSuccess;
+  <TSuccess, TError = Error>(
+    defaultValue: TSuccess,
+    remoteData: RemoteData<TSuccess, TError>,
+  ): TSuccess;
+  <TSuccess, TError = Error>(
+    defaultValue: TSuccess,
+  ): (remoteData: RemoteData<TSuccess, TError>) => TSuccess;
 }
 
 const withDefault: CurryWithDefault = curry(function withDefault<TSuccess, TResult, TError = Error>(
@@ -59,8 +64,13 @@ const withDefault: CurryWithDefault = curry(function withDefault<TSuccess, TResu
 });
 
 interface CurriedWhen {
-  <TSuccess, TError, TResult>(pattern: Pattern<TSuccess, TError, TResult>, remoteData: RemoteData<TSuccess, TError>): TResult;
-  <TSuccess, TError, TResult>(pattern: Pattern<TSuccess, TError, TResult>): (remoteData: RemoteData<TSuccess, TError>) => TResult;
+  <TSuccess, TError, TResult>(
+    pattern: Pattern<TSuccess, TError, TResult>,
+    remoteData: RemoteData<TSuccess, TError>,
+  ): TResult;
+  <TSuccess, TError, TResult>(
+    pattern: Pattern<TSuccess, TError, TResult>,
+  ): (remoteData: RemoteData<TSuccess, TError>) => TResult;
 }
 
 const when: CurriedWhen = curry(function when<TSuccess, TError, TResult>(
@@ -85,8 +95,13 @@ const when: CurriedWhen = curry(function when<TSuccess, TError, TResult>(
 });
 
 interface CurriedMap {
-  <TSuccess, TError, TResult>(fn: (value: TSuccess) => TResult, remoteData: RemoteData<TSuccess, TError>): RemoteData<TResult, TError>;
-  <TSuccess, TError, TResult>(fn: (value: TSuccess) => TResult): (remoteData: RemoteData<TSuccess, TError>) => RemoteData<TResult, TError>;
+  <TSuccess, TError, TResult>(
+    fn: (value: TSuccess) => TResult,
+    remoteData: RemoteData<TSuccess, TError>,
+  ): RemoteData<TResult, TError>;
+  <TSuccess, TError, TResult>(
+    fn: (value: TSuccess) => TResult,
+  ): (remoteData: RemoteData<TSuccess, TError>) => RemoteData<TResult, TError>;
 }
 
 const map: CurriedMap = curry(function map<TSuccess, TError, TResult>(
@@ -111,7 +126,7 @@ const andThen: CurriedAndThen = curry(function andThen<TSuccess, TError, TResult
   remoteData: RemoteData<TSuccess, TError>,
 ) {
   return isSuccess(remoteData) ? fn(remoteData.value) : remoteData;
-};
+});
 
 export {
   andThen,

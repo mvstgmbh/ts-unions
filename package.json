@@ -1,6 +1,6 @@
 {
   "name": "@mvst/ts-unions",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "TypeScript union types for Maybe and RemoteData with pattern matching",
   "sideEffects": false,
   "main": "dist/index.js",
