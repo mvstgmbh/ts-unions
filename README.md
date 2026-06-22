@@ -26,14 +26,14 @@ const someValue: Maybe<number> = M.just(42);
 const noValue: Maybe<number> = M.nothing();
 
 // Pattern matching
-M.when(someValue, {
+M.when({
   just: (value) => `Value is ${value}`,
   nothing: () => "No value"
-});
+}, someValue);
 
-M.when(someValue, {
-  _: () => "This is the fallack case"
-});
+M.when({
+  _: () => "This is the fallback case"
+}, someValue);
 
 
 // Transforming values
@@ -71,17 +71,17 @@ const successData: RemoteData<string> = RD.success("Data loaded");
 const errorData: RemoteData<string> = RD.error(new Error("Failed to load"));
 
 // Pattern matching
-RD.when(data, {
+RD.when({
   notAsked: () => "Not started",
   loading: () => "Loading...",
   success: (value) => `Data: ${value}`,
   error: (err) => `Error: ${err.message}`
-});
+}, data);
 
-RD.when(data, {
+RD.when({
   success: (value) => `Data: ${value}`,
   _: () => "This is the fallback case, all other cases are handled here"
-});
+}, data);
 
 // Transforming values
 const transformed = RD.map((value) => value.toUpperCase(), successData);
