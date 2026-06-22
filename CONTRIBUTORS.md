@@ -54,7 +54,7 @@ npm test
 
 ### Maintainers
 
-- [Matheus Lustosa](https://github.com/matheuslustosa)
+- [Matheus Lustosa](https://github.com/mllustosa)
 
 ### Contributors
 
