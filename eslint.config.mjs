@@ -12,6 +12,9 @@ const compat = new FlatCompat({
 });
 
 const config = [
+  {
+    ignores: ["dist/**"],
+  },
   ...compat.extends("prettier"),
   {
     plugins: {
